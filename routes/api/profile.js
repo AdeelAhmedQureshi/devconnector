@@ -18,6 +18,68 @@ const User = require('../models/User');
 router.get('/test',(req,res)=> res.json({msg: "Profile works"}));
 
 // @route GET api/profile
+// @desc  Get profile by handle  // SEO friendly way access
+// @access public
+router.get(
+    '/handle/:handle',   // express param get complete segment upto/ after :
+    (req,res) =>{
+        const errors = {};
+        // the way we can get handle from the URL by .params
+        Profile.findOne({handle: req.params.handle})  
+            .populate('user', ['name', 'avatar'])
+            .then(profile =>{
+                if(!profile){
+                    errors.noprofile="There is no profile for this user.";
+                    return res.status(404).json(errors);
+                }
+                // else
+                return res.json(profile);
+            })
+            .catch(err => res.status(404).json(err));
+    }
+);
+
+// @route GET api/profile/user/user_id
+// @desc  Get profile by user_id 
+// @access public
+router.get(
+    '/user/:user_id',   // express param get complete segment upto/ after :
+    (req,res) =>{
+        const errors = {};
+        // the way we can get user_id from the URL by .params
+        Profile.findOne({user: req.params.user_id})  
+            .populate('user', ['name', 'avatar'])
+            .then(profile =>{
+                if(!profile){
+                    errors.noprofile="There is no profile for this user.";
+                    return res.status(404).json(errors);
+                }
+                // else
+                return res.json(profile);
+            })
+            .catch(err => res.status(404).json({profile: "There is no profile for this user"}));        // or .json(err) mongodb defined error
+    }
+);
+
+// @route GET api/profile/all
+// @desc  Get all profiles
+// @access public
+router.get('/all', (req,res)=>{
+    const errors = {};
+    Profile.find()
+    .populate('user',['name','avatar'])
+    .then(profiles=>{
+        if(!profiles){
+            errors.noprofiles = "There are no profiles";
+            return res.status(404).json(errors);
+        }
+        res.json(profiles)
+    })
+    .catch(err => res.status(404).json({profile: "There are no profiles"}));
+}
+)
+
+// @route GET api/profile
 // @desc  Get current user profile (protected route)
 // @access private
 router.get(
@@ -78,6 +140,7 @@ router.post(
         if(req.body.twitter) profileFields.social.twitter = req.body.twitter;
         if(req.body.facebook) profileFields.social.facebook = req.body.facebook;
         if(req.body.linkedin) profileFields.social.linkedin = req.body.linkedin;
+        if(req.body.instagram) profileFields.social.linkedin = req.body.instagram;
 
         //education and experience has separate page like Add education Add experience, they can be multiple.
 
@@ -109,4 +172,25 @@ router.post(
     }
 );
 
+// @route POST api/profile/experience
+// @desc  ADD experience to currect user profile
+// @access private
+router.post('/experience', passport.authenticate('jwt', {session: false}), (req,res)=>{
+    Profile.findOne({user: req.user.id})
+        .then(profile=>{
+            const newExp={
+                title: req.body.title,
+                company: req.body.company,
+                location: req.body.location,
+                from: req.body.from,
+                to: req.body.to,
+                current: req.body.currect,
+                description: req.body.description
+            }
+
+            // Add to experience array
+            profile.experience.unshift(newExp);
+            profile.save().then(profile => res.json(profile));
+        })
+})
 module.exports = router;

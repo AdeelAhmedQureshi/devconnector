@@ -11,7 +11,8 @@ const ProfileSchema = new Schema({
         //This allows population (.populate()) to fetch user details when querying a profile. 
         ref: 'users' 
     },
-    handle:{
+    handle:{    // handle is basically a unique identifier or username for a user's profile.
+                // GitHub: https://github.com/john-doe → handle = "john-doe"
         type: String,
         required: true,         // required
         max: 40
@@ -63,7 +64,10 @@ const ProfileSchema = new Schema({
         current: {
             type: Boolean,
             default: false
-        }
+        },
+        description: {
+            type: String
+        },
         }
     ],
 
