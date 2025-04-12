@@ -26,13 +26,13 @@ module.exports = function validateLoginInput(data){
 
     // Password Validation
     if(validator.isEmpty(data.password)){
-        errors.password = "Password field is required";
-    }else if(!validator.isLength(data.password, {min:8, max:30})){
+        errors.password = "Password is required";
+    }else if( !validator.isLength(data.password, {min: 8, max: 30})){
         errors.password = "Password must be atleast 8 characters";
     }
-
+    
     return {
-        errors, //errors: errors
+        errors,     //errors: errors
         isValid: isEmpty(errors)
     }
 }
