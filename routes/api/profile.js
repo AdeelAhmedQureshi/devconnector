@@ -3,6 +3,7 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 const passport = require('passport');
+// const 
 
 // load Profile Model
 const Profile = require('../models/Profile');
@@ -44,6 +45,8 @@ router.post(
     '/', 
     passport.authenticate('jwt', {session: false}),
     (req,res)=> {
+        
+
         // Get fields
         const profileFields = {};
         profileFields.user = req.body.user;
@@ -62,6 +65,10 @@ router.post(
         // Social
         profileFields.social={};
         if(req.body.youtube) profileFields.social.youtube = req.body.youtube;
+        /*
+            Why we use req.body.youtube instead of req.body.social.youtube?
+            It’s because of how the frontend sends the data in the request body.
+        */
         if(req.body.twitter) profileFields.social.twitter = req.body.twitter;
         if(req.body.facebook) profileFields.social.facebook = req.body.facebook;
         if(req.body.linkedin) profileFields.social.linkedin = req.body.linkedin;

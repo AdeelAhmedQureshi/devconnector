@@ -13,7 +13,7 @@ const ProfileSchema = new Schema({
     },
     handle:{
         type: String,
-        required: true,
+        required: true,         // required
         max: 40
     },
     company: {
@@ -27,11 +27,11 @@ const ProfileSchema = new Schema({
     },
     status: {
         type: String,
-        required: true
+        required: true          // required
     },
-    skills: {
+    skills: {           
         type: [String],
-        required: true
+        required: true          // required
     },
     bio:{
         type: String
@@ -98,7 +98,8 @@ const ProfileSchema = new Schema({
         }
     ],
 
-    social: {
+    social: { 
+        // all the socila media plateforms are just fields
         youtube: {
             type: String
         },
