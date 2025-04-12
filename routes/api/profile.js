@@ -3,7 +3,8 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 const passport = require('passport');
-// const 
+// Load profile validator
+const validateProfileInput = require('../../validation/profile');
 
 // load Profile Model
 const Profile = require('../models/Profile');
@@ -26,6 +27,7 @@ router.get(
         const errors = {};
 
         Profile.findOne({user: req.user.id})
+            .populate('user', ['name','avatar'])
             .then(profile => {
                 if(!profile){
                     errors.noprofile = " There is no profile for this user";
@@ -45,11 +47,15 @@ router.post(
     '/', 
     passport.authenticate('jwt', {session: false}),
     (req,res)=> {
-        
-
+        // validating first profile inputs
+        const {errors , isValid} = validateProfileInput(req.body);
+        // check validity if there is any error in validation then res is:
+        if(!isValid){
+            return res.status(400).json(errors);
+        }
         // Get fields
         const profileFields = {};
-        profileFields.user = req.body.user;
+        profileFields.user = req.user.id;
         if(req.body.handle) profileFields.handle = req.body.handle;
         if(req.body.company) profileFields.company = req.body.company;
         if(req.body.website) profileFields.website = req.body.website;
@@ -59,7 +65,7 @@ router.post(
         if(req.body.githubusername) profileFields.githubusername = req.body.githubusername;
         // Skills (is string in Profile model) so, spit into array
         if(typeof req.body.skills !== undefined){
-            profileFields.Skills = req.body.skills.split(',');
+            profileFields.skills = req.body.skills.split(',');
         }
 
         // Social
@@ -92,8 +98,8 @@ router.post(
                     //Check if handle exist. handle for SEO to access profile page etc
                     Profile.findOne({handle: profileFields.handle}).then(profile =>{
                         if(profile){
-                            errors.handle = 'That handle already exists'
-                            res.status(404).json(errors)
+                            errors.handle = 'That handle already exists';
+                            return res.status(404).json(errors);
                         }
                         // save Profile
                         new Profile(profileFields).save().then(profile => res.json(profile))
