@@ -263,4 +263,20 @@ router.delete('/education/:edu_id',
         })
         .catch(err => res.status(404).json(err));
 });
+
+// @route DELETE api/account
+// @desc  delete profile and user (both at time)
+// @access private
+router.delete('/', 
+    passport.authenticate('jwt', {session: false}), 
+    (req,res)=>{
+    Profile.findOneAndDelete({user: req.user.id})  // from profile model
+        .then(profile=>{
+            User.findOneAndDelete({_id: req.user.id}) // from user model
+                .then(()=>{
+                    res.json({success: true});
+                })
+        })
+        .catch(err => res.status(404).json(err));
+});
 module.exports = router;
