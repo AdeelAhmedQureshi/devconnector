@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 // Load profile validator
 const validateProfileInput = require('../../validation/profile');
+// load Experience validator
+const validateExperienceInput = require('../../validation/experience');
 
 // load Profile Model
 const Profile = require('../models/Profile');
@@ -176,6 +178,10 @@ router.post(
 // @desc  ADD experience to currect user profile
 // @access private
 router.post('/experience', passport.authenticate('jwt', {session: false}), (req,res)=>{
+    const {errors, isValid} = validateExperienceInput(req.body);
+    if(!isValid){
+        return res.status(400).json(errors);
+    }
     Profile.findOne({user: req.user.id})
         .then(profile=>{
             const newExp={
