@@ -264,7 +264,7 @@ router.delete('/education/:edu_id',
         .catch(err => res.status(404).json(err));
 });
 
-// @route DELETE api/account
+// @route DELETE api/profile
 // @desc  delete profile and user (both at time)
 // @access private
 router.delete('/', 
